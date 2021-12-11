@@ -7,7 +7,7 @@ import argparse
 
 _author_ = ['Copyright 2021 North Loop Consulting']
 _copy_ = ['(C) 2021']
-_description_ = ("---Bitlocker_Key_Finder v1.0---"
+_description_ = ("---Bitlocker_Key_Finder v1.1---"
                  " A tool to locate and retrieve Bitlocker Recovery files."
                  " Searches file names and file content for recovery keys."
                  )
@@ -25,9 +25,8 @@ In_Vol = args.INPUT_VOLUME
 txt_Files = []
 for root, dirs, file in os.walk(In_Vol):
     for filename in file:
-    
-        if filename.endswith(('.txt', '.TXT')):  #filters to txt files
-            txt_Files.append(os.path.join(root, filename))
+        if filename.endswith(('.txt', '.TXT', '.bek', '.BEK')):  #filters to txt and bek files
+            txt_Files.append(os.path.join(root, filename))       #creates list of txt and bek files
 pattern = re.compile(r"\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}")
 Bit_Keys = []
 for ele in txt_Files:
