@@ -31,10 +31,12 @@ for root, dirs, file in os.walk(In_Vol):
 pattern = re.compile(r"\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}")
 Bit_Keys = []
 for ele in txt_Files:
-
     if fnmatch.fnmatch(ele, "*BitLocker Recovery Key*"):
         print(ele)
         Bit_Keys.append(ele)
+    if fnmatch.fnmatch(ele, "*.BEK"):
+            print(ele + '\n')
+            Bit_Keys.append(ele)
 
 if len(Bit_Keys) == 0:
     print("""***************************************************************************
