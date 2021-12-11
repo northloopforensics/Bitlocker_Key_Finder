@@ -1,13 +1,24 @@
-MIT License
+Bitlocker_Key_Finder Use License
 
-Copyright (c) 2021 northloopforensics
+Copyright (c) 2021 North Loop Consulting, LLC
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+North Loop Consulting provides its software tools under a dual license model 
+designed to meet the development and distribution needs of both commercial 
+entities and not-for-profit endeavors like open source projects.
+
+Permission to utlize this and other tools provided by North Loop Consulting, LLC
+in for-profit pursuits requires written approval and is subject fees. This 
+applies to, but is not limited to, using the tool for paid engagements, 
+incorporating the tool in whole, or in part, in a commercial software product, 
+and/or the sale, publishing, or distribution of the software. Questions about 
+acquiring licensing for use in a commercial setting can be sent to 
+northloopconsulting.com/contact-us.
+
+Permission is hereby granted, free of charge, to any entity obtaining a copy
+of this software and associated documentation files (the "Software") for 
+government, academic, or training purposes; to make use of, copy, modify, 
+and/or distribute copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
