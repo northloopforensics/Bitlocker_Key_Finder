@@ -42,15 +42,19 @@ def string_search():  #Regex for key values
 
 def copy_key_files():   #COPIES THE KEYS FROM BIT_KEYS LIST TO USER SELECTED DIRECTORY
     destination = values['OUTPUT']
-    print("Copying Key Related Files...")
+    print("*** COPYING KEY RELATED FILES... ***")
+    copy_list = []
+    for i in Bit_Keys:      #create a unique list of paths to avoid copy errors in monitor window
+        if i not in copy_list:
+            copy_list.append(i)
     try:
-        for key_File in Bit_Keys:
+        for key_File in copy_list:
             shutil.copy(key_File, destination)
 
     except Exception:
-        print(key_File +' Error Copying- check for user access to file or name collision in destination')
+        print(key_File +' - Error Copying- check for user access to file or name collision in destination')
         pass   
-    print("\nFiles copied to destination directory.\n")
+    print("\n*** FILES COPIED TO DESTINATION DIRECTORY. ***\n")
 
 sg.theme('Reddit')
 
@@ -83,7 +87,7 @@ while True:
         window.refresh()
     elif event == 'Ok':
         folder = os.walk(values["SOURCE"])
-        print("Collecting directory structure data...")
+        print("*** SEARCHING FOR KEY FILES... ***")
         walk()
         if values["FILENAME"] == True:
             print("Searching for file names in " + values['SOURCE'])
@@ -93,6 +97,6 @@ while True:
             string_search()
         if values['COPYSWITCH'] == True:
             copy_key_files()
-        print("\n******  COMPLETE  *****")
+        print("\n******  COMPLETE  ******")
     window.refresh()
 window.close()
