@@ -8,7 +8,7 @@ The intended use case is for forensic work necessitating such a search.
 v1.0 is a Python 3 script to locate Bitlocker Recovery Key text files.
 
 The only input required is the volume or directory to be searched.  Provide a volume or absolute path to a directory.
-After searching for relevant file names, a string search can be performed on text file contents.
+After searching for relevant file names, a string search can be performed on text file contents in the event a Recovery Key document has been renamed.
 
 Usage:  
 python Bitlocker_Key_Finder.py 'volume or directory'  
