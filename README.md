@@ -1,5 +1,7 @@
 # Bitlocker_Key_Finder
 
+*As mentioned in Thisweekin4n6. How cool is that!?!
+
 A digital forensic solution for addressing Bitlocker credentials.
 
 This tool automates the search for TXT and BEK files containing Bitlocker Recovery Keys.  It can search based on file name or patterns within relevant text files.
