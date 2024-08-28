@@ -1,3 +1,4 @@
+#Bitlocker Key Finder v3.2
 import re
 import os
 import fnmatch
@@ -16,7 +17,7 @@ Bit_Keys = []
 txt_Files = []
 now = datetime.datetime.now()
 
-# STARTUPINFO to hide the command window
+# STARTUPINFO to hide the command windows
 startupinfo = subprocess.STARTUPINFO()
 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -217,13 +218,13 @@ class BitlockerKeyFinderGUI:
 
     def show_help(self):
         help_message = (
-            "North Loop Consulting - Bitlocker Key Finder\n\n"
+            "Copyright 2024 North Loop Consulting\n"
+            "Bitlocker Key Finder\n\n"
             "1. Select the directory to search for Bitlocker Recovery Keys or BEK files.\n"
             "2. Choose search options:\n"
-            "   - File Name Search: Quickly finds files with specific names.\n"
+            "   - File Name Search: A quick search for file names consistent with key files.\n"
             "   - UTF-16LE String Search: Searches for Bitlocker keys in UTF-16LE encoded files.\n"
-            "   - Exhaustive String Search: Performs a thorough search but is slower.\n"
-            "     *String search occurs in files smaller than 1MB\n"
+            "   - Exhaustive String Search: Performs a search of all .txt files smaller than 1MB for keys.\n"
             "3. Optionally, enable the Copy Files option to copy found files to the output directory.\n"
             "4. Optionally, enable the recovery of keys from the current machine (ADMIN ONLY).\n"
             "5. Choose the output directory to save results.\n"
@@ -295,25 +296,41 @@ class BitlockerKeyFinderGUI:
         if not isAdmin():
             self.log_message("Admin rights are required to retrieve BitLocker keys.", "warning")
             return
-
         output_folder = self.output_entry.get()
+        comp_name = os.environ['COMPUTERNAME']  #gets target computer name for report title
+        comp_name = comp_name.strip('\\')
+        key_report = os.path.join(output_folder, comp_name + '-BitlockerReport.txt')
+        Drive_letters = ['%s:' % d for d in string.ascii_uppercase if os.path.exists('%s:' % d)]   #Produces list of volumes on target system
+
+        
         if not os.path.isdir(output_folder):
             self.log_message("Invalid output directory. Please select a valid directory.", "warning")
             return
-        
+        with open(key_report, 'w') as report:
+            report.write("Bitlocker Key Finder v3.0 \n")  #writing the header for the report 1) Version 2) Date 3)User of System
+            report.write(now.strftime("%Y-%m-%d, %H:%M:%S")) 
+            report.write("\nUser Account Used: ")
+            report.write(os.getlogin())
+            report.write("\n\n")
         try:
             volumes = subprocess.check_output(["manage-bde", "-status"], startupinfo=startupinfo).decode("utf-8")
+            self.log_message(volumes, "info")
             volume_lines = volumes.splitlines()
-            for line in volume_lines:
-                if "Volume" in line:
-                    volume = line.split()[1]
-                    try:
-                        recovery_keys = subprocess.check_output(["manage-bde", "-protectors", "-get", volume], startupinfo=startupinfo).decode("utf-8")
-                        with open(os.path.join(output_folder, f"{volume}_keys.txt"), "w") as key_file:
+            with open(key_report, "a") as key_file:
+                for line in volume_lines:
+                    
+                    if "Volume " in line:
+                        volume = line.split()[1]
+                        print(volume)
+                        try:
+                            recovery_keys = subprocess.check_output(["manage-bde", "-protectors", "-get", volume], startupinfo=startupinfo).decode("utf-8")
+                            key_file.write(f"Bitlocker key found for {volume}!\n\n")
                             key_file.write(recovery_keys)
-                            self.log_message(f"Copied BitLocker key for volume {volume}", "success")
-                    except subprocess.CalledProcessError:
-                        self.log_message(f"Failed to retrieve keys for volume {volume}", "warning")
+                            self.log_message(f"BitLocker key for volume {volume} written to report at {key_report}", "success")
+                            # self.log_message(f"{recovery_keys}", "info")
+                        except subprocess.CalledProcessError:
+                            # self.log_message(f"No BitLocker credentials found for {volume}", "warning")
+                            key_file.write(f"No BitLocker credentials found for {volume}\n\n")
         except Exception as e:
             self.log_message(f"Error retrieving BitLocker keys: {str(e)}", "error")
 
