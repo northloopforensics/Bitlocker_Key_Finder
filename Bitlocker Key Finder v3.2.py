@@ -1,4 +1,9 @@
 #Bitlocker Key Finder v3.2
+#Updates include
+#   New GUI 
+#   Improved speed
+#   More processing options
+#   
 import re
 import os
 import fnmatch
