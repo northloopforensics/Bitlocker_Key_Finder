@@ -133,11 +133,7 @@ class BitlockerKeyFinderGUI:
         self.master.after(100, self.periodic_refresh)  # Start periodic refresh
 
     def create_widgets(self):
-        # Title
-        # title_frame = tk.Frame(self.master, bg="#f0f0f0")
-        # title_frame.pack(pady=10)
-        # tk.Label(title_frame, text="Bitlocker Key Finder", font=("Arial", 24, "bold"), bg="#f0f0f0").pack()
-
+        
         # Find Saved Bitlocker .TXT and .BEK Files
         tk.Label(self.master, text="Find Saved Bitlocker .TXT and .BEK Files", font=("Arial", 12, "bold"), bg="#f0f0f0").pack(pady=5)
 
@@ -245,13 +241,6 @@ class BitlockerKeyFinderGUI:
         txt_Files = []
         folder_path = self.source_entry.get()
         
-        # Check directory validity
-        # if not os.path.isdir(folder_path):
-        #     self.log_message("Invalid directory path. Please select a valid directory.", "warning")
-        #     # Re-enable the Find Keys button
-        #     self.find_keys_button.config(state=tk.NORMAL)
-        #     return
-
         # Traverse the directory and find .txt and .BEK files
         walk(folder_path)
 
