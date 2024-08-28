@@ -1,9 +1,4 @@
 #Bitlocker Key Finder v3.2
-#Updates include
-#   New GUI 
-#   Improved speed
-#   More processing options
-#   
 import re
 import os
 import fnmatch
@@ -20,6 +15,7 @@ import threading
 pattern = re.compile(r"\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}-\d{6}")
 Bit_Keys = []
 txt_Files = []
+Collected_Keys = []
 now = datetime.datetime.now()
 
 # STARTUPINFO to hide the command windows
@@ -76,6 +72,7 @@ def exhaustive_string_search(gui):
                     Bit_Keys.append(ele)
                     gui.log_message(f"Found BitLocker key in file: {ele}", "success")
                     gui.log_message(f"Key: {key}", "info")
+                    Collected_Keys.append(key)
             except UnicodeDecodeError:
                 gui.log_message(f"Unable to decode file as {encoding}: {ele}", "warning")
             
@@ -102,11 +99,6 @@ def UTF16LE_string_search(gui):
             with open(ele, 'rb') as raw_file:
                 raw_content = raw_file.read()
 
-            # # Detect the encoding
-            # detected = chardet.detect(raw_content)
-            # encoding = detected['encoding']
-
-            # if encoding == 'utf-16-le':
             try:
                 decoded_content = raw_content.decode('utf-16-le')
                 k = re.findall(pattern, decoded_content)
@@ -114,6 +106,7 @@ def UTF16LE_string_search(gui):
                     Bit_Keys.append(ele)
                     gui.log_message(f"Found BitLocker key in file: {ele}", "success")
                     gui.log_message(f"Key: {key}", "info")
+                    Collected_Keys.append(key)
             except UnicodeDecodeError:
                 # gui.log_message(f"Unable to decode file as UTF-16LE: {ele}", "warning")
                 pass
@@ -327,6 +320,7 @@ class BitlockerKeyFinderGUI:
                             key_file.write(f"No BitLocker credentials found for {volume}\n\n")
         except Exception as e:
             self.log_message(f"Error retrieving BitLocker keys: {str(e)}", "error")
+        
 
     def log_message(self, message, level="info"):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
