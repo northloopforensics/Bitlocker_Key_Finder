@@ -12,7 +12,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import threading
 import docx
-import re
 import pandas as pd
 import csv
 from striprtf.striprtf import rtf_to_text
@@ -37,7 +36,7 @@ def isAdmin():
     except AttributeError:
         is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
     return is_admin
-def parse_docx(file):
+def parse_docx(gui,file):
     try:
         doc = docx.Document(file)
         for para in doc.paragraphs:
@@ -48,6 +47,7 @@ def parse_docx(file):
                 for key in key_match:
                     recovery_id = id_match[0] if id_match else "Unknown"
                     data.append({"File Path": file, "Recovery Key ID": recovery_id, "BitLocker Key": key})
+                    gui.log_message(f"File {file} Key ID {recovery_id} Bitlocker Key {key}", "info")
     except Exception as e:
         print(f"Error parsing {file}: {e}")
         return
@@ -101,31 +101,18 @@ def walk(folder):
             if file.endswith(('.txt', '.TXT', '.bek', '.BEK')):
                 txt_Files.append(os.path.join(root, file))
             
-def exhaustive_walk(folder):
+def exhaustive_walk(gui, folder):
     for root, dirs, files in os.walk(folder):
         for file in files:
             # if file.endswith(('.txt', '.TXT', '.bek', '.BEK')):
             #     txt_Files.append(os.path.join(root, file))
             if file.endswith(".docx"):
-                parse_docx(os.path.join(root, file))
+                parse_docx(gui, os.path.join(root, file))
             elif file.endswith(".xlsx"):
-                parse_xlsx(os.path.join(root, file))
+                parse_xlsx(gui, os.path.join(root, file))
             elif file.endswith(".rtf"):
-                parse_rtf(os.path.join(root, file))
+                parse_rtf(gui, os.path.join(root, file))
 
-def parse_txt(file):
-    try:
-        
-        with open(file, 'r', encoding='utf-8') as f:
-            text = f.read()
-            key_match = key_pattern.findall(text)
-            id_match = id_pattern.findall(text)
-            if key_match:
-                for key in key_match:
-                    recovery_id = id_match[0] if id_match else "Unknown"
-                    data.append({"File Path": file, "Recovery Key ID": recovery_id, "BitLocker Key": key})
-    except Exception as e:
-        print(f"Error parsing {file}: {e}")
 
 def name_search(gui):
     for ele in txt_Files:
@@ -205,11 +192,11 @@ def UTF16LE_string_search(gui):
                     for key in key_match:
                         recovery_id = id_match[0] if id_match else "Unknown"
                         data.append({"File Path": ele, "Recovery Key ID": recovery_id, "BitLocker Key": key})
-                for key in k:
-                    Bit_Keys.append(ele)
-                    gui.log_message(f"Found BitLocker key in file: {ele}", "success")
-                    gui.log_message(f"Key: {key}", "info")
-                    Collected_Keys.append(key)
+                
+                        Bit_Keys.append(ele)
+                        gui.log_message(f"Found BitLocker key in file: {ele}", "success")
+                        gui.log_message(f"Key: {key}", "info")
+                        Collected_Keys.append(key)
             except UnicodeDecodeError:
                 # gui.log_message(f"Unable to decode file as UTF-16LE: {ele}", "warning")
                 pass
@@ -223,6 +210,15 @@ def UTF16LE_string_search(gui):
         except Exception as e:
             gui.log_message(f"Error processing file {ele}: {str(e)}", "error")
 
+def make_key_report(report_folder):
+        output_folder = report_folder 
+        csv_file = os.path.join(output_folder, "BitlockerKeyReport" + now.strftime("%Y%m%d%H%M%S") + ".csv")
+        with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=["File Path", "Recovery Key ID", "BitLocker Key"])
+            writer.writeheader()
+            writer.writerows(data)
+            # print(data)
+        
 class BitlockerKeyFinderGUI:
     def __init__(self, master):
         self.master = master
@@ -283,7 +279,7 @@ class BitlockerKeyFinderGUI:
         self.find_keys_button.pack(side="left", padx=5)
         
         tk.Button(button_frame, text="Help", command=self.show_help, bg="orange", fg="black", relief=tk.RAISED).pack(side="left", padx=5)
-
+        
         # Console
         console_frame = tk.Frame(self.master, bg="#333333")
         console_frame.pack(fill="both", expand=True, padx=10, pady=5)
@@ -295,7 +291,8 @@ class BitlockerKeyFinderGUI:
         self.console.tag_configure("error", foreground="red")
         self.console.tag_configure("success", foreground="black")
         self.console.tag_configure("bold", font=("Arial", 10,))
-
+        self.progress = ttk.Progressbar(self.master, orient="horizontal", length=800, mode="determinate")
+        self.progress.pack(pady=0)
         clear_frame = tk.Frame(self.master, bg="#f0f0f0")
         clear_frame.pack(fill="x", padx=10, pady=(0, 10))  # Add padding at the bottom
         tk.Button(clear_frame, text="Clear Window", command=self.clear_console, bg="#FF5722", fg="white", relief=tk.RAISED).pack()
@@ -335,6 +332,8 @@ class BitlockerKeyFinderGUI:
         # Start the find keys process in a separate thread
         thread = threading.Thread(target=self.find_keys)
         thread.start()
+    
+    
 
     def find_keys(self):
         global Bit_Keys, txt_Files
@@ -344,6 +343,9 @@ class BitlockerKeyFinderGUI:
         
         # Traverse the directory and find .txt and .BEK files
         walk(folder_path)
+        total_files = len(txt_Files)
+        self.progress['value'] = 0
+        self.progress['maximum'] = total_files
 
         if self.filename_var.get():
             self.log_message(f"Searching for file names in {folder_path}", "info")
@@ -351,8 +353,11 @@ class BitlockerKeyFinderGUI:
 
         if self.exhaustive_search_var.get():
             self.log_message(f"Conducting exhaustive string search in {folder_path}", "info")
-            exhaustive_walk(folder_path)
+            exhaustive_walk(self, folder_path)
             exhaustive_search(self)
+            make_key_report(self.output_entry.get())
+            
+        
 
         if self.utf16le_search_var.get():
             self.log_message(f"Conducting UTF-16LE string search in {folder_path}", "info")
@@ -371,16 +376,7 @@ class BitlockerKeyFinderGUI:
         # Re-enable the Find Keys button
         self.find_keys_button.config(state=tk.NORMAL)
 
-    def make_key_report(self):
-        output_folder = self.output_entry.get()
-        csv_file = os.path.join(output_folder, "BitlockerKeyReport" + now.strftime("%Y%m%d%H%M%S") + ".csv")
-        with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=["File Path", "Recovery Key ID", "BitLocker Key"])
-            writer.writeheader()
-            writer.writerows(data)
-            # print(data)
-        self.log_message(f"Report generated: {csv_file}")
-        print(f"Report generated: {csv_file}")
+    
 
 
     def copy_key_files(self):
