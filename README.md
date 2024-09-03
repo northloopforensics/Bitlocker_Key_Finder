@@ -21,7 +21,7 @@ The script returns all findings to the command prompt.
 
 The GUI can be found in v2.1 and higher and includes additional functionality.
 
-![alt text](https://user-images.githubusercontent.com/73806121/149680341-bacc64a1-34be-41f2-b234-75fe7877a68b.png)
+![alt text](https://github.com/user-attachments/assets/adc3a22c-545b-4fa2-9bfe-fea5899bd4fa)
 
 Like the script, the GUI seeks saved Recovery Key files in both TXT and BEK formats.  It also recovers keys for mounted volumes on active systems. 
 
