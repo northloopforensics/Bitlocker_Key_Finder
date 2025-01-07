@@ -29,7 +29,7 @@ As of v3.0, opening the tool presents the user interface window (see above) and 
 
 Recovering keys for mounted volumes requires admin permissions. If you forget and attempt to use a function needing admin access, the tool will prompt you to restart it with elevated permissions.
 
-Identified TXT and BEK files can be copied to a location chosen by the user.  This same output location will be used to store a report for key information related to mounted volumes on the target system.
+Identified TXT, CSV, DOCX, XLSX, RTF, and BEK files can be copied to a location chosen by the user.  This same output location will be used to store a report for key information related to mounted volumes on the target system.
 
 Copied BEK files are visible. 
 
