@@ -25,7 +25,7 @@ The GUI can be found in v2.1 and higher and includes additional functionality.
 
 Like the script, the GUI seeks saved Recovery Key files in both TXT and BEK formats.  It also recovers keys for mounted volumes on active systems. 
 
-As of v3.0, opening the tool presents the user interface window (see above) and an output console window. Closing one window will close both of the windows.
+As of v3.0, opening the tool presents the user interface window (see above) and an output console window. 
 
 Recovering keys for mounted volumes requires admin permissions. If you forget and attempt to use a function needing admin access, the tool will prompt you to restart it with elevated permissions.
 
